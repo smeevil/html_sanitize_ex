@@ -14,9 +14,8 @@ defmodule HtmlSanitizeEx.Parser do  @doc """
   @spec parse(binary) :: html_tree
 
   def parse(html) do
-    html = "<#{@my_root_node}>#{html}</#{@my_root_node}>"
+    html = "<#{@my_root_node}>#{html}</#{@my_root_node}>" |> encode_spaces_between_tags
     {@my_root_node, [], parsed} = :mochiweb_html.parse(html)
-
     if length(parsed) == 1, do: hd(parsed), else: parsed
   end
 
@@ -35,4 +34,9 @@ defmodule HtmlSanitizeEx.Parser do  @doc """
       _ -> [list]
     end
   end
+
+  defp encode_spaces_between_tags(html) do
+    Regex.replace(~r/(\<\/\w+\>)\s(\<\w+\>)/, html, "\\g{1}&nbsp;\\g{2}")
+  end
+
 end
